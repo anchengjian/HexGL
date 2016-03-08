@@ -14,7 +14,10 @@
   OrientationController = (function() {
 
     OrientationController.isCompatible = function() {
-      return 'DeviceOrientationEvent' in window;
+
+      // 同样的转接了
+      // return 'DeviceOrientationEvent' in window;
+      return true;
     };
 
     /*
@@ -27,6 +30,9 @@
 
 
     function OrientationController(dom, registerTouch, touchCallback) {
+
+      alert(111);
+
       var _this = this;
       this.dom = dom;
       this.registerTouch = registerTouch != null ? registerTouch : true;
@@ -42,14 +48,35 @@
       window.addEventListener('deviceorientation', (function(e) {
         return _this.orientationChange(e);
       }), false);
+
+      // 来自远程
+      // socket.on('myGameOrientationHandler', function(data){
+      //   console.log(data);
+      //   return this.orientationChange(data);
+      // }.bind(this));
+
       if (this.registerTouch) {
         this.dom.addEventListener('touchstart', (function(e) {
+
+          console.log("\n\n\n\n\n\n\n\n\n",_this,"\n\n\n\n\n\n\n\n\n");
+
           return _this.touchStart(e);
         }), false);
         this.dom.addEventListener('touchend', (function(e) {
           return _this.touchEnd(e);
         }), false);
+
+        // 来自远程
+        socket.on('myGameTouchstart', function(data){
+          return this.touchStart(data);
+        }.bind(this));
+
+        socket.on('myGameTouchend', function(data){
+          return this.touchEnd(data);
+        }.bind(this));
       }
+
+
     }
 
     /*
@@ -57,7 +84,7 @@
     */
 
 
-    OrientationController.prototype.orientationChange = function(event) {
+    OrientationController.prototype.orientationChange = function(event) {      
       if (!this.active) {
         return;
       }

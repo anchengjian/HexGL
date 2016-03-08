@@ -12,10 +12,13 @@
   var TouchController, Vec2, exports, _base;
 
   TouchController = (function() {
-    TouchController.isCompatible = function() {
-      return 'ontouchstart' in document.documentElement;
-    };
 
+    TouchController.isCompatible = function() {
+
+      // 大屏幕需要，移动属性到移动端
+      // return 'ontouchstart' in document.documentElement;
+      return true;
+    };
 
     /*
       Creates a new TouchController
@@ -35,6 +38,7 @@
       this.stickPos = new Vec2(0, 0);
       this.stickStartPos = new Vec2(0, 0);
       this.stickVector = new Vec2(0, 0);
+
       this.dom.addEventListener('touchstart', ((function(_this) {
         return function(e) {
           return _this.touchStart(e);
@@ -50,6 +54,23 @@
           return _this.touchEnd(e);
         };
       })(this)), false);
+
+      socket.on('myGameTouchstart', function(data){
+        return this.touchStart(data);
+      }.bind(this));
+
+      socket.on('myGameTouchmove', function(data){
+        return this.touchMove(data);
+      }.bind(this));
+
+      socket.on('myGameTouchend', function(data){
+        return this.touchEnd(data);
+      }.bind(this));
+
+
+      // 发送屏幕消息
+      socket.emit('gameScreen', {width: window.innerWidth, height: window.innerHeight});
+
     }
 
 
@@ -88,7 +109,7 @@
 
     TouchController.prototype.touchMove = function(event) {
       var touch, _i, _len, _ref;
-      event.preventDefault();
+      // event.preventDefault();
       if (!this.active) {
         return;
       }

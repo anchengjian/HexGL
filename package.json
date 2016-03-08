@@ -1,0 +1,30 @@
+{
+  "name": "hexgl",
+  "version": "0.1.1",
+  "description": "html5 three.js socket",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anchengjian/HexGL.git"
+  },
+  "keywords": [
+    "html5",
+    "three.js",
+    "socket"
+  ],
+  "author": "anchengjian",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anchengjian/HexGL/issues"
+  },
+  "homepage": "https://github.com/anchengjian/HexGL#readme",
+  "dependencies": {
+    "express": "^4.13.4",
+    "compression": "^1.6.1",
+    "socket.io": "^1.4.5"
+  },
+  "devDependencies": {}
+}

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <title>handle</title>
+    <meta name="description" content="handle">
+    <meta name="keywords" content="handle">
+    <style type="text/css">
+    html,body{
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: hidden;
+    }
+    *{
+      moz-user-select: -moz-none;
+      -moz-user-select: none;
+      -o-user-select:none;
+      -khtml-user-select:none;
+      -webkit-user-select:none;
+      -ms-user-select:none;
+      user-select:none;
+    }
+    </style>
+  </head>
+<body>
+
+    <p>左右：<span id="alpha">0</span></p>
+    <p>前后：<span id="beta">0</span></p>
+    <p>扭转：<span id="gamma">0</span></p>
+    <p>指北针指向：<span id="heading">0</span>度</p>
+    <p>指北针精度：<span id="accuracy">0</span>度</p>
+    <hr />
+    <p>x轴加速度：<span id="x">0</span>米每二次方秒</p>
+    <p>y轴加速度：<span id="y">0</span>米每二次方秒</p>
+    <p>z轴加速度：<span id="z">0</span>米每二次方秒</p>
+    <hr />
+    <p>x轴加速度(考虑重力加速度)：<span id="xg">0</span>米每二次方秒</p>
+    <p>y轴加速度(考虑重力加速度)：<span id="yg">0</span>米每二次方秒</p>
+    <p>z轴加速度(考虑重力加速度)：<span id="zg">0</span>米每二次方秒</p>
+    <hr />
+    <p>左右旋转速度：<span id="Ralpha">0</span>度每秒</p>
+    <p>前后旋转速度：<span id="Rbeta">0</span>度每秒</p>
+    <p>扭转速度：<span id="Rgamma">0</span>度每秒</p>
+    <hr />
+    <p>上次收到通知的间隔：<span id="interval">0</span>毫秒</p>
+
+
+  <script src="/libs/socket.io.js"></script>
+  <script>
+
+    var socket = io(location.origin),
+        screenRate={
+          width: 1,
+          height: 1
+        };
+
+    // 监听服务端针对手机的消息
+    socket.on('phoneScreen', function (data) {
+      screenRate={
+        width: data.width/window.innerWidth,
+        height: data.height/window.innerHeight
+      };
+      alert('ok!');
+    });
+
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener("deviceorientation", orientationHandler, false);
+    } else {
+      document.body.textContent = "What user agent u r using???";
+    }
+
+    function getRes(event){
+      var res={
+        changedTouches:(function(){
+          var re={
+            length:event.changedTouches.length
+          };
+          for(var i=0;i<event.changedTouches.length;i++){
+            var tmp=event.changedTouches[i];
+            re[i]={
+              clientX: tmp.clientX*screenRate.width,
+              clientY: tmp.clientY*screenRate.height,
+              force: tmp.force,
+              identifier: tmp.identifier,
+              pageX: tmp.pageX*screenRate.width,
+              pageY: tmp.pageY*screenRate.height,
+              radiusX: tmp.radiusX*screenRate.width,
+              radiusY: tmp.radiusY*screenRate.height,
+              rotationAngle: tmp.rotationAngle,
+              screenX: tmp.screenX*screenRate.width,
+              screenY: tmp.screenY*screenRate.height
+            }
+          }
+          return re;
+        })(),
+        touches:(function(){
+          var re={
+            length:event.changedTouches.length
+          };
+          for(var i=0;i<event.touches.length;i++){
+            var tmp=event.touches[i];
+            re[i]={
+              clientX: tmp.clientX*screenRate.width,
+              clientY: tmp.clientY*screenRate.height,
+              force: tmp.force,
+              identifier: tmp.identifier,
+              pageX: tmp.pageX*screenRate.width,
+              pageY: tmp.pageY*screenRate.height,
+              radiusX: tmp.radiusX*screenRate.width,
+              radiusY: tmp.radiusY*screenRate.height,
+              rotationAngle: tmp.rotationAngle,
+              screenX: tmp.screenX*screenRate.width,
+              screenY: tmp.screenY*screenRate.height
+            }
+          }
+          return re;
+        })(),
+        type:event.type,
+        keyCode:event.keyCode
+      };
+      return res;
+    }
+
+    document.body.addEventListener('touchstart',function(event){
+      socket.emit('myPhoneTouchstart', getRes(event));
+    });
+
+    document.body.addEventListener('touchmove',function(event){
+      socket.emit('myPhoneTouchmove',  getRes(event));
+    });
+
+    document.body.addEventListener('touchend',function(event){
+      socket.emit('myPhoneTouchend',  getRes(event));
+    });
+
+    function orientationHandler(event) {
+      socket.emit('myPhoneOrientationHandler',{
+        alpha:event.alpha,
+        beta:event.beta,
+        gamma:event.gamma,
+        webkitCompassHeading:event.webkitCompassHeading,
+        webkitCompassAccuracy:event.webkitCompassAccuracy
+      });
+
+      document.getElementById("alpha").textContent = event.alpha;
+      document.getElementById("beta").textContent = event.beta;
+      document.getElementById("gamma").textContent = event.gamma;
+      document.getElementById("heading").textContent = event.webkitCompassHeading;
+      document.getElementById("accuracy").textContent = event.webkitCompassAccuracy;
+    }
+
+    // if (window.DeviceMotionEvent) {
+    //   window.addEventListener("devicemotion", motionHandler, false);
+    // } else {
+    //   document.body.textContent = "What user agent u r using???";
+    // }
+    function motionHandler(event) {
+      document.getElementById("interval").textContent = event.interval;
+      var acc = event.acceleration;
+      document.getElementById("x").textContent = acc.x;
+      document.getElementById("y").textContent = acc.y;
+      document.getElementById("z").textContent = acc.z;
+      var accGravity = event.accelerationIncludingGravity;
+      document.getElementById("xg").textContent = accGravity.x;
+      document.getElementById("yg").textContent = accGravity.y;
+      document.getElementById("zg").textContent = accGravity.z;
+      var rotationRate = event.rotationRate;
+      document.getElementById("Ralpha").textContent = rotationRate.alpha;
+      document.getElementById("Rbeta").textContent = rotationRate.beta;
+      document.getElementById("Rgamma").textContent = rotationRate.gamma;
+    }
+
+
+  </script>
+
+</body>
+</html>

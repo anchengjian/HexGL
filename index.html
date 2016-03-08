@@ -30,15 +30,15 @@
       }
     </style>
     <script type="text/javascript">
-    //analytics
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-26274524-4']);
-    _gaq.push(['_trackPageview']);
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
+      //analytics
+      // var _gaq = _gaq || [];
+      // _gaq.push(['_setAccount', 'UA-26274524-4']);
+      // _gaq.push(['_trackPageview']);
+      // (function() {
+      //   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      //   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      //   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      // })();
     </script>
   </head>
 
@@ -124,6 +124,21 @@
     <script src="bkcore/hexgl/HexGL.js"></script>
 
     <script src="launch.js"></script>
+
+    <script src="/libs/socket.io.js"></script>
+    <script>
+      var socket = io(location.origin),
+
+          addr='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=',
+          qrcodeImg=document.querySelector('#menu').appendChild(new Image());
+          qrcodeImg.style.width='80px';
+      // 接受消息并生成二维码
+      socket.emit('gameScreen',  {aa:233,width: window.innerWidth, height: window.innerHeight});
+      socket.on('gameScreen', function (data) {
+        
+        qrcodeImg.src=(addr+'http://'+data.ip+'/handle.html');
+      });
+    </script>
 
   </body>
 </html>
