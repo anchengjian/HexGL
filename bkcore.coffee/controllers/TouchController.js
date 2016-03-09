@@ -15,7 +15,7 @@
 
     TouchController.isCompatible = function() {
 
-      // 大屏幕需要，移动属性到移动端
+      // Need to agree to continue to play
       // return 'ontouchstart' in document.documentElement;
       return true;
     };
@@ -67,8 +67,6 @@
         return this.touchEnd(data);
       }.bind(this));
 
-
-      // 发送屏幕消息
       socket.emit('gameScreen', {width: window.innerWidth, height: window.innerHeight});
 
     }

@@ -15,7 +15,7 @@
 
     OrientationController.isCompatible = function() {
 
-      // 同样的转接了
+      // Need to agree to continue to play
       // return 'DeviceOrientationEvent' in window;
       return true;
     };
@@ -30,9 +30,6 @@
 
 
     function OrientationController(dom, registerTouch, touchCallback) {
-
-      alert(111);
-
       var _this = this;
       this.dom = dom;
       this.registerTouch = registerTouch != null ? registerTouch : true;
@@ -49,11 +46,10 @@
         return _this.orientationChange(e);
       }), false);
 
-      // 来自远程
-      // socket.on('myGameOrientationHandler', function(data){
-      //   console.log(data);
-      //   return this.orientationChange(data);
-      // }.bind(this));
+      socket.on('myGameOrientationHandler', function(data){
+        console.log(data);
+        return this.orientationChange(data);
+      }.bind(this));
 
       if (this.registerTouch) {
         this.dom.addEventListener('touchstart', (function(e) {
@@ -66,7 +62,6 @@
           return _this.touchEnd(e);
         }), false);
 
-        // 来自远程
         socket.on('myGameTouchstart', function(data){
           return this.touchStart(data);
         }.bind(this));
